@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10151b">
+<title>KitKat Web Emulator</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header><div class="brand"><span class="android">●</span><div><strong>KitKat Web Emulator</strong><small>Android-x86 4.4 · browser edition</small></div></div><div class="actions"><button id="fullscreen" disabled>Fullscreen</button><button id="stop" disabled>Stop</button></div></header>
+<main>
+<section class="setup">
+<h1>Boot Android 4.4</h1>
+<p>Try Android-x86 4.4 in an x86 virtual machine running in WebAssembly. Choose an ISO file stored on this device.</p>
+<label class="filepick">Choose Android-x86 ISO<input id="iso" type="file" accept=".iso,application/x-cd-image"></label>
+<div class="settings"><label>Guest RAM<select id="ram"><option value="384">384 MB</option><option value="512" selected>512 MB</option><option value="768">768 MB</option></select></label><label>Session<select disabled><option>Live · temporary</option></select></label></div>
+<button id="start" disabled>Start emulator</button>
+<p class="hint">No virtual hard disk is attached. Choose Live / Run Android in the boot menu, not Install. Guest changes disappear when the VM stops or the page reloads.</p>
+<div id="status" role="status" aria-live="polite">Waiting for ISO…</div>
+</section>
+<section class="machine">
+<div class="screenbar"><span>Virtual display · 480 × 800 frame</span><span id="vmstate">OFF</span></div>
+<div id="screen-wrap"><div id="screen" tabindex="0"><div class="placeholder"><div class="robot">●</div><strong>Android VM is stopped</strong><span>Select an ISO and press Start.</span></div></div></div>
+<div class="controls"><button data-key="ESC">Back / Esc</button><button data-key="ENTER">Enter</button><button data-key="UP">▲</button><button data-key="DOWN">▼</button><button data-key="LEFT">◀</button><button data-key="RIGHT">▶</button><button data-key="TAB">Tab</button></div>
+<p class="hint">Tap the VM screen to focus it. A physical keyboard works when connected.</p>
+</section>
+</main>
+<footer>Powered by <a href="https://github.com/copy/v86" target="_blank" rel="noreferrer">v86</a>. Android-x86 is not included.</footer>
+<script src="https://cdn.jsdelivr.net/npm/v86@latest/build/libv86.js"></script>
+<script src="./app.js"></script>
+</body></html>
