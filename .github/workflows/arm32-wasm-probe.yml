@@ -25,7 +25,10 @@ jobs:
       - name: Build Emscripten cross toolchain image
         run: |
           set -euxo pipefail
-          # zlib moved its historical release tarballs to /fossils/; patch the upstream Dockerfile URL.\n          cp qemu-src/tests/docker/dockerfiles/emsdk-wasm32-cross.docker /tmp/emsdk-wasm32-cross.docker\n          sed -i 's#https://zlib.net/zlib-#https://zlib.net/fossils/zlib-#' /tmp/emsdk-wasm32-cross.docker\n          docker build --progress=plain -t qemu101-wasm-base -f /tmp/emsdk-wasm32-cross.docker qemu-src
+          # zlib moved its historical release tarballs to /fossils/; patch the upstream Dockerfile URL.
+          cp qemu-src/tests/docker/dockerfiles/emsdk-wasm32-cross.docker /tmp/emsdk-wasm32-cross.docker
+          sed -i 's#https://zlib.net/zlib-#https://zlib.net/fossils/zlib-#' /tmp/emsdk-wasm32-cross.docker
+          docker build --progress=plain -t qemu101-wasm-base -f /tmp/emsdk-wasm32-cross.docker qemu-src
 
       - name: Configure and compile 32-bit ARM system emulator
         run: |
