@@ -6,13 +6,15 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/arm32-wasm-probe.yml"
-  push:
-    branches: [armv7-port-scaffold]
-    paths:
-      - ".github/workflows/arm32-wasm-probe.yml"
 
 permissions:
   contents: read
+
+# A branch update also updates its pull request, so one PR-triggered build is enough.
+# Keep manual dispatch available for deliberate rebuilds.
+concurrency:
+  group: arm32-wasm-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-arm32-wasm:
