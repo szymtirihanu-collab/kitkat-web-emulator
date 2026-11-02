@@ -33,7 +33,7 @@ jobs:
           run-id: 41414728013
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package public downloads
+      - name: Package and split public downloads
         shell: bash
         run: |
           set -euo pipefail
@@ -42,15 +42,16 @@ jobs:
           test -s qemu/qemu-system-arm.worker.js
           (cd qemu && zip -9 ../qemu-system-arm-wasm.zip qemu-system-arm.js qemu-system-arm.wasm qemu-system-arm.worker.js)
           test -s guest/android-19-armeabi-v7a.zip
-          cp guest/android-19-armeabi-v7a.zip android-4.4-api19-armv7.zip
+          split -b 16m -d -a 3 guest/android-19-armeabi-v7a.zip android-4.4-api19-armv7.part-
+          ls -lh android-4.4-api19-armv7.part-*
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: kitkat-api19-armv7-assets
-          name: KitKat API 19 ARMv7 browser assets
+          tag_name: kitkat-api19-armv7-assets-v2
+          name: KitKat API 19 ARMv7 browser assets (chunked)
           prerelease: true
           make_latest: false
           files: |
             qemu-system-arm-wasm.zip
-            android-4.4-api19-armv7.zip
+            android-4.4-api19-armv7.part-*
