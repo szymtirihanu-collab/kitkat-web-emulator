@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111820">
+<title>KitKat ARMv7 · Development</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header><a class="brand" href="../">‹ <span>KitKat Web Emulator</span></a><span class="tag">ARMv7 DEVELOPMENT</span></header>
+<main>
+<section class="hero">
+<p class="eyebrow">ANDROID 4.4 · API 19 · 32-BIT ARM</p>
+<h1>KitKat <span>ARMv7</span></h1>
+<p class="lead">A real ARM browser emulator needs an ARM CPU runtime and Android's matching Goldfish virtual hardware. This is the isolated development area for that port.</p>
+<div class="notice"><b>Backend not ready</b><p>This page does not boot Android yet. The ARM QEMU/WebAssembly backend has not been built or tested. No fake Start button is shown.</p></div>
+</section>
+<section class="panel">
+<div class="section-head"><div><p class="eyebrow">PORT CHECKLIST</p><h2>What must work</h2></div><span class="counter">0 / 5</span></div>
+<ol class="steps">
+<li><span class="num">01</span><div><b>ARMv7 CPU in WebAssembly</b><p>Compile a browser-compatible ARM system emulator and validate instruction execution.</p></div><span class="state">NOT BUILT</span></li>
+<li><span class="num">02</span><div><b>Goldfish machine and devices</b><p>Port the KitKat-era board, framebuffer, input, timer, storage and emulator channels.</p></div><span class="state">NOT BUILT</span></li>
+<li><span class="num">03</span><div><b>KitKat guest assets</b><p>Match the API 19 ARM kernel, ramdisk and system image to the emulated board.</p></div><span class="state">NOT ADDED</span></li>
+<li><span class="num">04</span><div><b>Browser display and controls</b><p>Connect the guest framebuffer, keyboard and touch input to this page.</p></div><span class="state">NOT BUILT</span></li>
+<li><span class="num">05</span><div><b>Boot to Android launcher</b><p>Prove a clean boot in a real browser before calling the port functional.</p></div><span class="state">NOT TESTED</span></li>
+</ol>
+</section>
+<section class="links">
+<a href="https://glasshouse.mojolayers.com/info" target="_blank" rel="noreferrer"><span><b>QEMU in WebAssembly</b><small>Browser ARM emulation architecture reference</small></span>↗</a>
+<a href="https://android.googlesource.com/platform/external/qemu/+/emu-dev/" target="_blank" rel="noreferrer"><span><b>Android QEMU source</b><small>Android-specific emulator extensions</small></span>↗</a>
+<a href="https://android.googlesource.com/platform/external/qemu/+/emu-master-dev/android/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT" target="_blank" rel="noreferrer"><span><b>Goldfish hardware specification</b><small>Virtual devices expected by Android guests</small></span>↗</a>
+<a href="../ARMV7_PORT.md"><span><b>Engineering plan</b><small>Build phases, constraints and current status</small></span>→</a>
+</section>
+<p class="foot">The existing x86 emulator remains available at the <a href="../">main page</a>. This experimental ARM page is not part of the production deployment until it can boot a real guest.</p>
+</main>
+</body>
+</html>
