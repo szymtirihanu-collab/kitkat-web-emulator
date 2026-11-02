@@ -1,0 +1,38 @@
+name: Provision Android 4.4 ARMv7 guest assets
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/provision-kitkat-assets.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download Android SDK API 19 ARMv7 system image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          url="https://dl.google.com/android/repository/sys-img/android/armeabi-v7a-19_r05.zip"
+          curl --fail --location --retry 3 "$url" -o dist/android-19-armeabi-v7a.zip
+          unzip -t dist/android-19-armeabi-v7a.zip
+          mkdir -p dist/extracted
+          unzip -q dist/android-19-armeabi-v7a.zip -d dist/extracted
+          echo "Archive contents:"
+          find dist/extracted -maxdepth 4 -type f -printf '%P %s bytes\n' | sort
+          echo "Candidate boot assets:"
+          find dist/extracted -type f \( -iname 'kernel*' -o -iname 'ramdisk*' -o -iname 'system.img' -o -iname 'userdata.img' \) -print
+      - name: Upload provisioned guest package for engineering
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-4.4-api19-armv7-sdk-image
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
