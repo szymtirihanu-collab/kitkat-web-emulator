@@ -1,12 +1,12 @@
 (()=>{const $=id=>document.getElementById(id),log=$("log"),say=s=>{log.textContent+=String(s)+"\n";log.scrollTop=log.scrollHeight;},state=s=>$("state").textContent=s,progress=n=>$("progress").style.width=n+"%";const api="https://api.github.com/repos/szymtirihanu-collab/kitkat-web-emulator";say("LOADER BUILD: public-release-2026-11-02");
 async function getJson(url){const r=await fetch(url);if(!r.ok)throw Error("GitHub API returned "+r.status);return r.json();}
-async function getZip(url,label){state("Downloading "+label+"…");say("GET "+label);const r=await fetch(url);if(!r.ok)throw Error(label+" download failed ("+r.status+").");const blob=await r.blob();say(label+": "+(blob.size/1048576).toFixed(1)+" MiB downloaded.");return JSZip.loadAsync(blob);}
+async function getZip(asset,label){state("Downloading "+label+"…");say("GET "+label+" ("+asset.size+" bytes)");let r;try{r=await fetch(api+"/releases/assets/"+asset.id,{headers:{Accept:"application/octet-stream"}});}catch(e){throw Error(label+" network/CORS failure: "+(e.message||e));}if(!r.ok)throw Error(label+" download failed ("+r.status+" "+r.statusText+").");const blob=await r.blob();say(label+": "+(blob.size/1048576).toFixed(1)+" MiB downloaded.");try{return await JSZip.loadAsync(blob);}catch(e){throw Error(label+" ZIP extraction failed: "+(e.message||e));}}
 function find(zip,suffixes){for(const suffix of suffixes){const name=Object.keys(zip.files).find(n=>n.endsWith(suffix)&&!zip.files[n].dir);if(name)return zip.files[name];}throw Error("Archive is missing "+suffixes.join(" / "));}
 async function data(zip,suffixes){return new Uint8Array(await find(zip,suffixes).async("arraybuffer"));}
 $("prepare").onclick=async()=>{const button=$("prepare");button.disabled=true;log.textContent="";try{
 state("Finding public asset release…");say("Button works. No file imports are required.");progress(5);
 const release=await getJson(api+"/releases/tags/kitkat-api19-armv7-assets");
-const asset=name=>{const a=release.assets.find(x=>x.name===name);if(!a)throw Error("Release asset not published yet: "+name);return a.browser_download_url;};
+const asset=name=>{const a=release.assets.find(x=>x.name===name);if(!a)throw Error("Release asset not published yet: "+name);return a;};
 progress(10);
 const [qemu,guest]=await Promise.all([getZip(asset("qemu-system-arm-wasm.zip"),"QEMU runtime"),getZip(asset("android-4.4-api19-armv7.zip"),"Android 4.4 ARMv7 images")]);
 state("Extracting Android guest…");progress(60);
