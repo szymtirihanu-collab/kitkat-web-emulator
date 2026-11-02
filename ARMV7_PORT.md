@@ -1,46 +1,53 @@
-# Android 4.4 KitKat ARMv7 browser port
+# ARMv7 KitKat browser port — feasibility update
 
-## Status: backend not implemented
+## Important discovery
 
-This project currently boots an x86 guest with v86. That runtime cannot boot an ARM guest, so changing the ISO picker or relabelling the x86 machine would not create an ARM port.
+A browser-based ARM QEMU runtime is technically possible: Glasshouse documents QEMU compiled to WebAssembly with an ARM64 JIT and a browser UI. That proves the general browser/QEMU/WASM approach is viable, but it does **not** provide a drop-in Android 4.4 ARMv7 emulator or Goldfish machine.
 
-The target is **Android 4.4 / API 19 / ARMv7-A (armeabi-v7a)**.
+- Glasshouse architecture overview: https://glasshouse.mojolayers.com/info
+- Android's QEMU fork and Android-specific drivers: https://android.googlesource.com/platform/external/qemu/+/emu-dev/
+- Goldfish virtual hardware specification: https://android.googlesource.com/platform/external/qemu/+/emu-master-dev/android/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT
+- QEMU ARM machine model documentation: https://www.qemu.org/docs/master/system/target-arm.html
 
-## Required guest platform
+## Target
 
-KitKat's Android emulator kernel is from the Goldfish 3.4 generation. The guest must be paired with the matching Android virtual hardware, not a generic ARM PC:
+- Android 4.4.x (KitKat), API 19
+- ARMv7-A / armeabi-v7a (32-bit)
+- Goldfish-era ARM board and matching kernel/device drivers
 
-- ARMv7-A CPU (Cortex-A8-compatible baseline)
-- KitKat-era Goldfish kernel and matching board configuration
-- Matching API 19 ARM system image and ramdisk
-- Goldfish virtual devices expected by the guest (framebuffer, input, timer/RTC, audio, pipes, storage, and related devices)
+## Why this is not a frontend-only change
 
-Google's Android kernel documentation maps KitKat 4.4.x to the 3.4 Goldfish kernel and documents the ARMv7-A `goldfish_armv7_defconfig`. It also distinguishes the legacy Goldfish board from Ranchu. Sources:
-- https://android.googlesource.com/platform/external/qemu/+/master/docs/ANDROID-KERNEL.TXT
-- https://android.googlesource.com/platform/external/qemu/+/master/docs/GOLDFISH-VIRTUAL-HARDWARE.TXT
+The guest kernel expects Goldfish devices. At minimum, the browser emulator needs a matching machine implementation and working devices for framebuffer, input, timer/RTC, storage, and Android emulator communication channels. A generic ARM `virt` machine is not a substitute. The existing root page uses v86, which emulates x86 and cannot execute this ARM guest.
 
-## Why a generic ARM WebAssembly QEMU build is not enough
+## Work plan
 
-QEMU's ARM system emulator requires an explicit machine model. An image built for one board normally will not boot on another. The standard QEMU `virt` board is not the Android Goldfish board.
+### Phase 1 — runtime port
+- Pin a reproducible Android QEMU source revision.
+- Determine the smallest Goldfish ARM machine/device set required by the API 19 guest.
+- Port/build the ARM system emulator to WebAssembly.
+- Provide browser-safe memory, worker, clock, storage, console, and framebuffer integration.
+- Verify a small ARM Linux Goldfish test kernel before Android.
 
-The browser runtime therefore needs an Android-compatible QEMU build with the Goldfish ARM machine and devices preserved, compiled to WebAssembly with the required browser I/O and display adapters. The current v86 dependency is x86-only and cannot be reused for this.
+### Phase 2 — KitKat guest
+- Obtain legally redistributable or user-provided API 19 ARM kernel, ramdisk, and system image.
+- Verify image/board compatibility and kernel command line.
+- Boot through init and reach the Android launcher.
+- Add touch, keyboard, display rotation, audio, and networking only after basic boot works.
 
-References:
-- https://www.qemu.org/docs/master/system/target-arm.html
-- https://android.googlesource.com/platform/external/qemu/+/emu-master-dev/android/docs/ANDROID-KERNEL.TXT
+### Phase 3 — quality and deployment
+- Add persistent disk storage using browser storage APIs.
+- Add memory/CPU controls and save/reset controls.
+- Run automated smoke tests and publish only after a real browser boot succeeds.
 
-## Implementation sequence
+## Current status
 
-1. Build a reproducible WebAssembly target from the Android QEMU Goldfish source tree, including the ARM Goldfish board and devices.
-2. Verify that the resulting module exports a usable browser-facing API and can run a small ARM Linux Goldfish test image.
-3. Add browser adapters for serial console, framebuffer, keyboard/touch input, storage, and pause/stop.
-4. Boot the matching KitKat API 19 ARMv7 kernel + ramdisk + system image.
-5. Test a clean boot to the Android launcher in a real browser before enabling the ARM page as a working emulator.
+| Component | Status |
+|---|---|
+| ARM guest CPU in a browser | Demonstrated by other QEMU/WASM projects; not integrated here |
+| Android Goldfish ARM machine in WASM | Not built |
+| KitKat API 19 guest assets | Not included |
+| Browser framebuffer/input adapters | Not implemented |
+| Successful KitKat boot | Not tested |
+| Existing x86/v86 page | Preserved on `main` |
 
-## Current repository behavior
-
-- `/`: existing experimental x86/v86 page. Kept unchanged.
-- No ARM boot backend or KitKat images are currently bundled.
-- No claim is made that ARM boot works until the above tests pass.
-
-This file is the engineering handoff for the ARMv7 port; it is deliberately not presented as a working emulator.
+No fake boot button or placeholder console is presented as a functioning emulator. This branch is an isolated ARM port work area; the production page remains unchanged until the backend boots successfully.
