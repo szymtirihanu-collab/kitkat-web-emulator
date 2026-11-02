@@ -1,0 +1,56 @@
+name: Publish public KitKat browser assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-kitkat-assets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download QEMU WebAssembly artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: qemu-system-arm-wasm-baseline
+          path: qemu
+          repository: ${{ github.repository }}
+          run-id: 41417879412
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Android 4.4 ARMv7 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-4.4-api19-armv7-sdk-image
+          path: guest
+          repository: ${{ github.repository }}
+          run-id: 41414728013
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package public downloads
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s qemu/qemu-system-arm.js
+          test -s qemu/qemu-system-arm.wasm
+          test -s qemu/qemu-system-arm.worker.js
+          (cd qemu && zip -9 ../qemu-system-arm-wasm.zip qemu-system-arm.js qemu-system-arm.wasm qemu-system-arm.worker.js)
+          test -s guest/android-19-armeabi-v7a.zip
+          cp guest/android-19-armeabi-v7a.zip android-4.4-api19-armv7.zip
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: kitkat-api19-armv7-assets
+          name: KitKat API 19 ARMv7 browser assets
+          prerelease: true
+          make_latest: false
+          files: |
+            qemu-system-arm-wasm.zip
+            android-4.4-api19-armv7.zip
