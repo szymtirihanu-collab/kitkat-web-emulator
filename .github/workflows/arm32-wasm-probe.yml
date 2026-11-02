@@ -2,6 +2,10 @@ name: Build ARM32 QEMU WebAssembly baseline
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/arm32-wasm-probe.yml"
   push:
     branches: [armv7-port-scaffold]
     paths:
@@ -35,21 +39,21 @@ jobs:
         run: |
           set -euxo pipefail
           mkdir -p build
-          docker run --rm \\
-            -v "$PWD/qemu-src:/qemu-src" \\
-            -v "$PWD/build:/build" \\
-            -w /build \\
-            qemu101-wasm-base \\
+          docker run --rm \
+            -v "$PWD/qemu-src:/qemu-src" \
+            -v "$PWD/build:/build" \
+            -w /build \
+            qemu101-wasm-base \
             bash -lc '
               set -euxo pipefail
-              emconfigure /qemu-src/configure \\
-                --static \\
-                --target-list=arm-softmmu \\
-                --without-default-features \\
-                --enable-system \\
-                --enable-tcg-interpreter \\
-                --disable-tools \\
-                --disable-docs \\
+              emconfigure /qemu-src/configure \
+                --static \
+                --target-list=arm-softmmu \
+                --without-default-features \
+                --enable-system \
+                --enable-tcg-interpreter \
+                --disable-tools \
+                --disable-docs \
                 --disable-pie
               ninja -j"$(nproc)" qemu-system-arm.js
               test -s qemu-system-arm.js
