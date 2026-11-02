@@ -22,6 +22,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Stage browser assets on the Pages origin
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p armv7/assets
+          base="https://github.com/${GITHUB_REPOSITORY}/releases/download/kitkat-api19-armv7-assets-v2"
+          curl --fail --location --retry 3 "$base/qemu-system-arm-wasm.zip" -o armv7/assets/qemu-system-arm-wasm.zip
+          for n in 000 001 002 003 004 005 006 007 008 009; do
+            curl --fail --location --retry 3 "$base/android-4.4-api19-armv7.part-$n" -o "armv7/assets/android-4.4-api19-armv7.part-$n"
+          done
+          du -sh armv7/assets
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
