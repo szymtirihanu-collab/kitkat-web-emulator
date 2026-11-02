@@ -2,31 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10151b">
-<title>KitKat Web Emulator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1018">
+<meta name="description" content="Experimental Android 4.4 KitKat ARMv7 browser emulator project.">
+<title>KitKat ARMv7 — Web Emulator</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header><div class="brand"><span class="android">●</span><div><strong>KitKat Web Emulator</strong><small>Android-x86 4.4 · browser edition</small></div></div><div class="actions"><button id="fullscreen" disabled>Fullscreen</button><button id="stop" disabled>Stop</button></div></header>
+<div class="shell">
+<header class="topbar"><a class="brand" href="./"><span class="brand-icon">K</span><span>KITKAT<span class="muted"> / ARMv7</span></span></a><div class="top-meta"><span class="live-dot"></span> DEVELOPMENT BUILD <a href="./ARMV7_PORT.md">PORT STATUS ↗</a></div></header>
 <main>
-<section class="setup">
-<h1>Boot Android 4.4</h1>
-<p>Try Android-x86 4.4 in an x86 virtual machine running in WebAssembly. Choose an ISO file stored on this device.</p>
-<label class="filepick">Choose Android-x86 ISO<input id="iso" type="file" accept=".iso,application/x-cd-image"></label>
-<div class="settings"><label>Guest RAM<select id="ram"><option value="384">384 MB</option><option value="512" selected>512 MB</option><option value="768">768 MB</option></select></label><label>Session<select disabled><option>Live · temporary</option></select></label></div>
-<button id="start" disabled>Start emulator</button>
-<p class="hint">No virtual hard disk is attached. Choose Live / Run Android in the boot menu, not Install. Guest changes disappear when the VM stops or the page reloads.</p>
-<div id="status" role="status" aria-live="polite">Waiting for ISO…</div>
-</section>
-<section class="machine">
-<div class="screenbar"><span>Virtual display · 480 × 800 frame</span><span id="vmstate">OFF</span></div>
-<div id="screen-wrap"><div id="screen" tabindex="0"><div class="placeholder"><div class="robot">●</div><strong>Android VM is stopped</strong><span>Select an ISO and press Start.</span></div></div></div>
-<div class="controls"><button data-key="ESC">Back / Esc</button><button data-key="ENTER">Enter</button><button data-key="UP">▲</button><button data-key="DOWN">▼</button><button data-key="LEFT">◀</button><button data-key="RIGHT">▶</button><button data-key="TAB">Tab</button></div>
-<p class="hint">Tap the VM screen to focus it. A physical keyboard works when connected.</p>
-</section>
-</main>
-<footer>Powered by <a href="https://github.com/copy/v86" target="_blank" rel="noreferrer">v86</a>. Android-x86 is not included.</footer>
-<script src="https://cdn.jsdelivr.net/npm/v86@latest/build/libv86.js"></script>
-<script src="./app.js"></script>
-</body></html>
+<section class="intro"><div class="kicker">ANDROID 4.4 · API LEVEL 19 · ARMv7-A · 32-BIT</div><h1>Run <span>KitKat</span><br>in your browser.</h1><p class="intro-copy">A native ARM virtual machine is being brought to WebAssembly. This is the emulator workspace—not an Android simulation or a bootable release yet.</p><div class="status-banner"><div class="status-symbol">!</div><div><strong>ARM engine is not ready yet</strong><p>The ARM32 QEMU build is being tested. Android Goldfish hardware and browser display/input support are still missing, so boot is unavailable.</p></div><span class="status-pill">IN DEVELOPMENT</span></div></section>
+<section class="workspace"><div class="workspace-head"><div><div class="kicker">01 / GUEST CONFIGURATION</div><h2>Android system files</h2></div><span class="local-tag">LOCAL FILES ONLY</span></div><p class="section-copy">Choose matching ARMv7 KitKat files when you have them. Files are selected locally and are not uploaded.</p><div class="file-grid"><label class="file-card" for="kernel"><span class="file-icon">01</span><span class="file-name">Kernel image</span><span class="file-hint">zImage / Image</span><span class="file-value" id="kernel-name">No file selected</span><input id="kernel" type="file"></label><label class="file-card" for="ramdisk"><span class="file-icon">02</span><span class="file-name">Ramdisk</span><span class="file-hint">initrd / ramdisk.img</span><span class="file-value" id="ramdisk-name">No file selected</span><input id="ramdisk" type="file"></label><label class="file-card" for="system"><span class="file-icon">03</span><span class="file-name">System image</span><span class="file-hint">system.img</span><span class="file-value" id="system-name">No file selected</span><input id="system" type="file"></label></div><div class="config-row"><div><span class="config-label">TARGET MACHINE</span><strong>Goldfish ARMv7 <span class="pending">· PORT PENDING</span></strong></div><div><span class="config-label">GUEST ARCHITECTURE</span><strong>ARMv7-A · 32-bit</strong></div><div><span class="config-label">ANDROID VERSION</span><strong>4.4.x · API 19</strong></div></div><div class="launch-row"><div class="launch-note"><span class="lock">⌑</span><span><b>Boot is locked</b><small>Waiting for a tested ARM engine and Goldfish machine.</small></span></div><button id="boot" disabled>ENGINE NOT READY <span>↗</span></button></div></section>
+<section class="lower-grid"><div class="panel"><div class="kicker">02 / BOOT PIPELINE</div><h2>Build progress</h2><ul class="pipeline"><li class="done"><span class="pipeline-mark">✓</span><span><b>QEMU source downloaded</b><small>QEMU 10.1 ARM system target</small></span><em>DONE</em></li><li class="working"><span class="pipeline-mark">◌</span><span><b>WebAssembly toolchain</b><small>Emscripten cross-build in CI</small></span><em>BUILDING</em></li><li><span class="pipeline-mark">03</span><span><b>Goldfish ARM hardware</b><small>Board, framebuffer, input and devices</small></span><em>TODO</em></li><li><span class="pipeline-mark">04</span><span><b>Browser display + controls</b><small>Framebuffer, keyboard and touch</small></span><em>TODO</em></li><li><span class="pipeline-mark">05</span><span><b>Boot Android launcher</b><small>Real API 19 guest boot verification</small></span><em>TODO</em></li></ul></div><div class="panel screen-panel"><div class="screen-head"><div><div class="kicker">03 / VIRTUAL DISPLAY</div><h2>Emulator output</h2></div><span class="off-pill">OFFLINE</span></div><div class="screen"><div class="screen-mark">K</div><div class="screen-title">No guest running</div><div class="screen-sub">The display will appear here after the ARM engine is integrated.</div><div class="screen-line"></div><div class="screen-foot">QEMU ARM · WASM · GOLDFISH</div></div><div class="console"><span class="console-dot"></span><span id="console-text">SYSTEM: Waiting for ARM runtime build…</span></div></div></section>
+<footer><span>UNOFFICIAL OPEN-SOURCE DEVELOPMENT PROJECT</span><span><a href="https://github.com/szymtirihanu-collab/kitkat-web-emulator">GITHUB</a> · <a href="https://github.com/szymtirihanu-collab/kitkat-web-emulator/tree/main">PREVIOUS X86 VERSION</a></span></footer>
+</main></div><script src="./app.js"></script></body></html>
