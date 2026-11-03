@@ -1,4 +1,4 @@
-name: Publish public KitKat browser assets
+name: Publish compact KitKat browser assets
 
 on:
   push:
@@ -33,7 +33,34 @@ jobs:
           run-id: 41414728013
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package and split public downloads
+      - name: Extract and compact guest images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir extracted
+          unzip -q guest/android-19-armeabi-v7a.zip -d extracted
+          find extracted -type f -maxdepth 4 -printf '%p %s bytes\n'
+          base="$(find extracted -name kernel-qemu -type f | head -1)"
+          ram="$(find extracted -name ramdisk.img -type f | head -1)"
+          sys="$(find extracted -name system.img -type f | head -1)"
+          usr="$(find extracted -name userdata.img -type f | head -1)"
+          test -s "$base" && test -s "$ram" && test -s "$sys" && test -s "$usr"
+          cp "$base" kernel-qemu
+          cp "$ram" ramdisk.img
+          for img in "$sys" "$usr"; do
+            e2fsck -fy "$img" || true
+            resize2fs -M "$img"
+            e2fsck -fy "$img" || true
+            blocks="$(dumpe2fs -h "$img" 2>/dev/null | awk -F: '/^Block count:/ {gsub(/ /,"",$2); print $2}')"
+            blocksize="$(dumpe2fs -h "$img" 2>/dev/null | awk -F: '/^Block size:/ {gsub(/ /,"",$2); print $2}')"
+            test -n "$blocks" && test -n "$blocksize"
+            truncate -s "$((blocks * blocksize))" "$img"
+          done
+          cp "$sys" system.img
+          cp "$usr" userdata.img
+          ls -lh kernel-qemu ramdisk.img system.img userdata.img
+
+      - name: Package QEMU runtime
         shell: bash
         run: |
           set -euo pipefail
@@ -41,17 +68,17 @@ jobs:
           test -s qemu/qemu-system-arm.wasm
           test -s qemu/qemu-system-arm.worker.js
           (cd qemu && zip -9 ../qemu-system-arm-wasm.zip qemu-system-arm.js qemu-system-arm.wasm qemu-system-arm.worker.js)
-          test -s guest/android-19-armeabi-v7a.zip
-          split -b 16m -d -a 3 guest/android-19-armeabi-v7a.zip android-4.4-api19-armv7.part-
-          ls -lh android-4.4-api19-armv7.part-*
 
-      - name: Publish release assets
+      - name: Publish compact assets
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: kitkat-api19-armv7-assets-v2
-          name: KitKat API 19 ARMv7 browser assets (chunked)
+          tag_name: kitkat-api19-armv7-assets-v3
+          name: KitKat API 19 ARMv7 compact browser assets
           prerelease: true
           make_latest: false
           files: |
             qemu-system-arm-wasm.zip
-            android-4.4-api19-armv7.part-*
+            kernel-qemu
+            ramdisk.img
+            system.img
+            userdata.img
