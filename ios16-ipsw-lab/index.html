@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d14">
+<meta name="description" content="Local browser-based IPSW inspector for iPhone 11 and iOS 16.5.">
+<title>IPSW Lab — iPhone 11 · iOS 16.5</title>
+<link rel="stylesheet" href="./style.css">
+<script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script defer src="./app.js"></script>
+</head>
+<body>
+<header class="bar"><a class="brand" href="./">IPSW<span>LAB</span></a><span class="tag">EXPERIMENTAL · BROWSER TOOL</span></header>
+<main>
+<section class="hero"><p class="eyebrow">DEVICE RESEARCH / 01</p><h1>Explore an<br><em>iPhone IPSW.</em></h1><p class="lead">Load an iOS 16.5 firmware archive for the standard iPhone 11. Inspect its manifest and files locally in your browser.</p><div class="target"><span class="pulse"></span><div><b>Target device</b><small>iPhone 11 · iPhone12,1 · A13 Bionic</small></div><strong>iOS 16.5 / 20F66</strong></div></section>
+<section class="upload panel"><div class="section-head"><div><p class="eyebrow">01 / INPUT</p><h2>Select firmware</h2></div><span class="local">LOCAL ONLY</span></div>
+<label class="drop" id="drop"><input id="ipsw" type="file" accept=".ipsw,.zip,application/zip"><span class="upload-icon">↑</span><b>Drop your IPSW here</b><small>or tap to choose an .ipsw file</small><span class="file" id="filename">No firmware selected</span></label>
+<div class="progress-wrap" id="progress-wrap" hidden><div class="progress-label"><span id="progress-text">Reading archive…</span><span id="progress-pct">0%</span></div><div class="track"><div id="progress"></div></div></div>
+<p class="privacy">The firmware is read locally. It is not uploaded to GitHub or any server. Large IPSWs can use several gigabytes of browser memory.</p></section>
+<section class="results panel"><div class="section-head"><div><p class="eyebrow">02 / ANALYSIS</p><h2>Firmware report</h2></div><span class="state" id="state">WAITING</span></div>
+<div class="metrics"><div><small>Archive</small><b id="archive-size">—</b></div><div><small>Files found</small><b id="file-count">—</b></div><div><small>Manifest</small><b id="manifest-status">—</b></div></div>
+<div class="manifest" id="manifest"><div class="empty">Choose an IPSW to inspect its BuildManifest.plist and archive contents.</div></div>
+<div class="file-tools"><input id="filter" type="search" placeholder="Filter archive paths…" disabled><span id="shown">0 entries</span></div><div class="file-list" id="file-list"><div class="empty">Archive entries will appear here.</div></div></section>
+<section class="panel reality"><p class="eyebrow">03 / EMULATION REALITY CHECK</p><h2>Why QEMU-in-WebAssembly won't boot this IPSW</h2><p>QEMU's generic ARM virtual machines do not reproduce the iPhone 11's Apple SoC, Secure Boot chain, device tree, SEP, storage controller, display and other platform hardware. An IPSW is an Apple restore bundle—not a standalone virtual-machine disk.</p><div class="status-grid"><div><b>IPSW inspection</b><span class="yes">AVAILABLE IN THIS TOOL</span></div><div><b>iPhone 11 hardware emulation</b><span class="no">NOT PROVIDED BY QEMU</span></div><div><b>Booting iOS 16.5 in browser</b><span class="no">NOT CURRENTLY FEASIBLE</span></div></div><p class="note">This page deliberately does not show a fake boot screen or claim that iOS is running. It is a firmware-analysis frontend, not an iPhone emulator.</p></section>
+<footer>IPSW LAB · EXPERIMENTAL RESEARCH TOOL · NO FIRMWARE HOSTED HERE</footer>
+</main>
+</body></html>
